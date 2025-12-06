@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* הגדרות גלובליות */
+body {
+  background-color: #f3f4f6; /* הרקע האפור הבהיר מהעיצוב */
+  color: #1f2937;
+  direction: rtl; /* יישור לימין */
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
