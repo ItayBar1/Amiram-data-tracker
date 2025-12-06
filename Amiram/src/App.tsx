@@ -182,20 +182,39 @@ export default function AmiramTracker() {
     }
   };
 
-  // 4. מחיקה מה-DB
   const handleDelete = async (id: number) => {
-    if (!confirm("למחוק?")) return;
+    const result = await Swal.fire({
+      title: "האם אתה בטוח?",
+      text: "לא תוכל לשחזר את הציון לאחר המחיקה",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "כן, מחק את זה",
+      cancelButtonText: "ביטול",
+    });
+
+    if (!result.isConfirmed) return;
 
     const { error } = await supabase.from("scores").delete().eq("id", id);
 
-    if (error)
+    if (error) {
       Swal.fire({
         text: "שגיאה במחיקת הציון",
-        icon: "warning",
+        icon: "error",
         confirmButtonText: "הבנתי",
-        confirmButtonColor: "#d33",
       });
-    else setScores((prev) => prev.filter((item) => item.id !== id));
+    } else {
+      setScores((prev) => prev.filter((item) => item.id !== id));
+
+      Swal.fire({
+        title: "נמחק!",
+        text: "הציון הוסר בהצלחה",
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    }
   };
 
   const handleLogout = async () => {
