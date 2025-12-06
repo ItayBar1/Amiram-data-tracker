@@ -10,7 +10,6 @@ import {
   ReferenceArea,
 } from "recharts";
 import {
-  Download,
   Plus,
   Trash2,
   Trophy,
@@ -116,7 +115,7 @@ const StatCard: React.FC<{
 export default function AmiramTracker() {
   const [session, setSession] = useState<any>(null);
   const [scores, setScores] = useState<ScoreData[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
   const [newDate, setNewDate] = useState(
     new Date().toISOString().split("T")[0]
   );
