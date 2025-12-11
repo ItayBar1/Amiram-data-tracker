@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { type Session } from "@supabase/supabase-js";
 import { supabase } from "./supabase";
-// Added Shuffle icon for the reshuffle button
-import { Loader2, Plus, Trash2, History, Brain, Book, Shuffle } from "lucide-react";
+import { Plus, Trash2, History, Brain, Book, Shuffle } from "lucide-react";
 import Swal from "sweetalert2";
+import LoadingIndicator from "./LoadingIndicator";
 
 export type VocabWord = {
   id: string;
@@ -52,7 +52,7 @@ const VocabPage: React.FC<VocabPageProps> = ({ session }) => {
   const reshuffleCards = () => {
     // Create a shallow copy to shuffle
     const shuffled = [...words];
-    
+
     // Fisher-Yates Shuffle Algorithm for unbiased random selection
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -61,7 +61,7 @@ const VocabPage: React.FC<VocabPageProps> = ({ session }) => {
 
     // Take the first 9 items (or less if there aren't 9 words yet)
     setDisplayedWords(shuffled.slice(0, 9));
-    
+
     // Reset flipped state so new cards start facing front
     setFlippedCards({});
   };
@@ -94,12 +94,12 @@ const VocabPage: React.FC<VocabPageProps> = ({ session }) => {
     const trimmedHebrew = hebrewWord.trim();
 
     if (!trimmedEnglish || !trimmedHebrew) {
-        Swal.fire({
-            text: "אנא מלא את שני השדות",
-            icon: "warning",
-            confirmButtonText: "הבנתי",
-        });
-        return;
+      Swal.fire({
+        text: "אנא מלא את שני השדות",
+        icon: "warning",
+        confirmButtonText: "הבנתי",
+      });
+      return;
     }
 
     const { data, error } = await supabase
@@ -124,18 +124,18 @@ const VocabPage: React.FC<VocabPageProps> = ({ session }) => {
       setWords((prev) => [data, ...prev]);
       setEnglishWord("");
       setHebrewWord("");
-      
+
       const Toast = Swal.mixin({
         toast: true,
-        position: 'top-end',
+        position: "top-end",
         showConfirmButton: false,
         timer: 3000,
-        timerProgressBar: true
-      })
+        timerProgressBar: true,
+      });
       Toast.fire({
-        icon: 'success',
-        title: 'המילה נוספה בהצלחה'
-      })
+        icon: "success",
+        title: "המילה נוספה בהצלחה",
+      });
     }
   };
 
@@ -177,27 +177,24 @@ const VocabPage: React.FC<VocabPageProps> = ({ session }) => {
     setFlippedCards((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  // We keep 'sortedWords' (full list) for the sidebar, while the grid uses 'displayedWords'
-  const sortedWords = useMemo(() => words, [words]);
-
   return (
     <div className="min-h-screen bg-[#f3f4f6] font-sans text-right" dir="rtl">
-      {/* Header Section (Matching TrackerPage styling) */}
+      {/* Header Section */}
       <div className="bg-[#3b5bdb] pb-24 pt-10 px-4 relative shadow-lg">
         <div className="max-w-7xl mx-auto text-center relative z-10">
           <h1 className="text-4xl font-extrabold text-white mb-2">
             אוצר מילים אישי
           </h1>
-          
+
           <div className="inline-block bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-xl min-w-[300px] mt-6">
-            <p className="text-blue-100 text-sm mb-1">
-              כמות המילים שנצברו
-            </p>
+            <p className="text-blue-100 text-sm mb-1">כמות המילים שנצברו</p>
             <h2 className="text-3xl font-bold text-white mb-1">
               {words.length}
             </h2>
             <p className="text-blue-200 text-sm">
-              {words.length > 0 ? "המשך כך! תרגול מביא לשלמות 🧠" : "הוסף מילים כדי להתחיל לתרגל"}
+              {words.length > 0
+                ? "המשך כך! תרגול מביא לשלמות 🧠"
+                : "הוסף מילים כדי להתחיל לתרגל"}
             </p>
           </div>
         </div>
@@ -205,13 +202,10 @@ const VocabPage: React.FC<VocabPageProps> = ({ session }) => {
 
       <main className="max-w-7xl mx-auto px-4 -mt-12 relative z-20 pb-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
           {/* Main Column - Cards & Add Form (Center/Right) */}
           <div className="lg:col-span-8 space-y-6 order-1 lg:order-2">
-            
             {/* Flashcards Area */}
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 min-h-[400px]">
-              
               {/* Header with Title and Reshuffle Button */}
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-bold text-gray-700 flex items-center gap-2">
@@ -219,20 +213,21 @@ const VocabPage: React.FC<VocabPageProps> = ({ session }) => {
                 </h2>
 
                 {words.length > 0 && (
-                    <button 
-                        onClick={reshuffleCards}
-                        className="flex items-center gap-2 text-sm text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors font-bold"
-                        title="החלף מילים לתרגול"
-                    >
-                        <Shuffle size={16} />
-                        ערבב מחדש
-                    </button>
+                  <button
+                    onClick={reshuffleCards}
+                    className="flex items-center gap-2 text-sm text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors font-bold"
+                    title="החלף מילים לתרגול"
+                  >
+                    <Shuffle size={16} />
+                    ערבב מחדש
+                  </button>
                 )}
               </div>
-              
+
+              {/* UPDATED LOADING STATE */}
               {isLoading ? (
-                <div className="flex items-center justify-center h-64 text-gray-500">
-                  <Loader2 className="animate-spin mr-2" /> טוען כרטיסיות...
+                <div className="h-64 flex items-center justify-center">
+                  <LoadingIndicator text="טוען כרטיסיות..." />
                 </div>
               ) : words.length === 0 ? (
                 <div className="text-center py-20 text-gray-400">
@@ -241,7 +236,6 @@ const VocabPage: React.FC<VocabPageProps> = ({ session }) => {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {/* Using displayedWords (random 9) instead of sortedWords (full list) */}
                   {displayedWords.map((word) => {
                     const isFlipped = flippedCards[word.id];
                     return (
@@ -258,18 +252,28 @@ const VocabPage: React.FC<VocabPageProps> = ({ session }) => {
                           {/* Front - English */}
                           <div className="flashcard-face flex items-center justify-center h-full p-4">
                             <div className="text-center">
-                              <p className="text-xs text-gray-400 mb-1 font-medium tracking-wider">ENGLISH</p>
-                              <p className="text-lg font-bold text-gray-800" dir="ltr">
+                              <p className="text-xs text-gray-400 mb-1 font-medium tracking-wider">
+                                ENGLISH
+                              </p>
+                              <p
+                                className="text-lg font-bold text-gray-800"
+                                dir="ltr"
+                              >
                                 {word.english_word}
                               </p>
                             </div>
                           </div>
-                          
+
                           {/* Back - Hebrew */}
                           <div className="flashcard-face flashcard-back flex items-center justify-center h-full p-4 bg-blue-50/50">
                             <div className="text-center">
-                              <p className="text-xs text-blue-500 mb-1 font-medium">עברית</p>
-                              <p className="text-lg font-bold text-blue-900" dir="rtl">
+                              <p className="text-xs text-blue-500 mb-1 font-medium">
+                                עברית
+                              </p>
+                              <p
+                                className="text-lg font-bold text-blue-900"
+                                dir="rtl"
+                              >
                                 {word.hebrew_word}
                               </p>
                             </div>
@@ -282,7 +286,7 @@ const VocabPage: React.FC<VocabPageProps> = ({ session }) => {
               )}
             </div>
 
-            {/* Add Word Form (Blue Bar Style) */}
+            {/* Add Word Form */}
             <div className="bg-blue-50 border border-blue-100 p-6 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="flex items-center gap-3 w-full md:w-auto">
                 <div className="bg-blue-600 p-2 rounded-full text-white">
@@ -292,7 +296,7 @@ const VocabPage: React.FC<VocabPageProps> = ({ session }) => {
                   <h3 className="font-bold text-blue-900">הוספת מילה</h3>
                 </div>
               </div>
-              
+
               <form
                 onSubmit={handleAddWord}
                 className="flex flex-col sm:flex-row gap-3 w-full md:w-auto items-center bg-white p-2 rounded-xl shadow-sm border border-blue-100"
@@ -326,7 +330,7 @@ const VocabPage: React.FC<VocabPageProps> = ({ session }) => {
             </div>
           </div>
 
-          {/* Side Column - List (History Style) */}
+          {/* Side Column - List */}
           <div className="lg:col-span-4 space-y-6 order-2 lg:order-1">
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col h-[600px]">
               <div className="p-4 border-b border-gray-100 bg-gray-50/50">
@@ -334,47 +338,53 @@ const VocabPage: React.FC<VocabPageProps> = ({ session }) => {
                   <History size={16} /> רשימת מילים ({words.length})
                 </h3>
               </div>
-              
+
               <div className="overflow-y-auto p-3 space-y-2 custom-scrollbar flex-1">
                 {words.length === 0 ? (
-                    <div className="text-center py-8 text-gray-400 text-sm">
+                  <div className="text-center py-8 text-gray-400 text-sm">
                     אין מילים ברשימה
                   </div>
                 ) : (
-                    words.map((word) => (
+                  words.map((word) => (
                     <div
-                        key={word.id}
-                        className="group flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-blue-50 transition-colors border border-transparent hover:border-blue-100"
+                      key={word.id}
+                      className="group flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-blue-50 transition-colors border border-transparent hover:border-blue-100"
                     >
-                        <div className="flex flex-col gap-1 w-full">
-                            <div className="flex justify-between items-center w-full">
-                                <span className="font-bold text-gray-800 text-sm" dir="ltr">{word.english_word}</span>
-                                <span className="text-sm text-gray-600">{word.hebrew_word}</span>
-                            </div>
-                            <span className="text-[10px] text-gray-400">
-                                {formatDate(word.created_at)}
-                            </span>
+                      <div className="flex flex-col gap-1 w-full">
+                        <div className="flex justify-between items-center w-full">
+                          <span
+                            className="font-bold text-gray-800 text-sm"
+                            dir="ltr"
+                          >
+                            {word.english_word}
+                          </span>
+                          <span className="text-sm text-gray-600">
+                            {word.hebrew_word}
+                          </span>
                         </div>
-                        
-                        <div className="mr-3 border-r border-gray-200 pr-2">
-                            <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleDelete(word.id);
-                            }}
-                            className="text-gray-300 hover:text-red-500 transition-colors p-1"
-                            title="מחק מילה"
-                            >
-                            <Trash2 size={16} />
-                            </button>
-                        </div>
+                        <span className="text-[10px] text-gray-400">
+                          {formatDate(word.created_at)}
+                        </span>
+                      </div>
+
+                      <div className="mr-3 border-r border-gray-200 pr-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(word.id);
+                          }}
+                          className="text-gray-300 hover:text-red-500 transition-colors p-1"
+                          title="מחק מילה"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
                     </div>
-                    ))
+                  ))
                 )}
               </div>
             </div>
           </div>
-
         </div>
       </main>
     </div>
