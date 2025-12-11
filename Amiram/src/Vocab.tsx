@@ -29,7 +29,10 @@ const VocabPage: React.FC<VocabPageProps> = ({ session }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [englishWord, setEnglishWord] = useState("");
   const [hebrewWord, setHebrewWord] = useState("");
-  const [flippedCards, setFlippedCards] = useState<Record<string, boolean>>({});
+  
+  // CHANGED: Track only the ID of the currently active (open) card. 
+  // Null means no card is showing the translation.
+  const [activeCardId, setActiveCardId] = useState<string | null>(null);
 
   // New state to hold the specific 9 words currently displayed in the grid
   const [displayedWords, setDisplayedWords] = useState<VocabWord[]>([]);
@@ -48,6 +51,23 @@ const VocabPage: React.FC<VocabPageProps> = ({ session }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [words]);
 
+  // CHANGED: Timer logic to auto-close the card after 10 seconds.
+  useEffect(() => {
+    // If no card is active, there is nothing to time.
+    if (!activeCardId) return;
+
+    // Start a 10-second timer to flip the card back to English.
+    const timer = setTimeout(() => {
+      setActiveCardId(null);
+    }, 10000);
+
+    // Cleanup function:
+    // This runs if the user clicks a different card (changing activeCardId)
+    // or manually closes the current card BEFORE the 10 seconds are up.
+    // It prevents the old timer from firing incorrectly.
+    return () => clearTimeout(timer);
+  }, [activeCardId]);
+
   // Helper function to shuffle and pick 9 distinct words
   const reshuffleCards = () => {
     // Create a shallow copy to shuffle
@@ -62,8 +82,8 @@ const VocabPage: React.FC<VocabPageProps> = ({ session }) => {
     // Take the first 9 items (or less if there aren't 9 words yet)
     setDisplayedWords(shuffled.slice(0, 9));
 
-    // Reset flipped state so new cards start facing front
-    setFlippedCards({});
+    // CHANGED: Reset active card state so new cards start facing front
+    setActiveCardId(null);
   };
 
   const fetchWords = async () => {
@@ -173,8 +193,12 @@ const VocabPage: React.FC<VocabPageProps> = ({ session }) => {
     }
   };
 
-  const toggleCard = (id: string) => {
-    setFlippedCards((prev) => ({ ...prev, [id]: !prev[id] }));
+  // CHANGED: Toggle logic now manages the single activeCardId
+  const handleCardClick = (id: string) => {
+    // If the clicked card is already active, close it (set to null).
+    // If it's a different card, set it as the new active card.
+    // This immediately flips the previous card back because the state changes.
+    setActiveCardId(current => current === id ? null : id);
   };
 
   return (
@@ -224,7 +248,7 @@ const VocabPage: React.FC<VocabPageProps> = ({ session }) => {
                 )}
               </div>
 
-              {/* UPDATED LOADING STATE */}
+              {/* LOADING STATE */}
               {isLoading ? (
                 <div className="h-64 flex items-center justify-center">
                   <LoadingIndicator text="טוען כרטיסיות..." />
@@ -237,12 +261,14 @@ const VocabPage: React.FC<VocabPageProps> = ({ session }) => {
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {displayedWords.map((word) => {
-                    const isFlipped = flippedCards[word.id];
+                    // CHANGED: Determine if flipped based on activeCardId
+                    const isFlipped = activeCardId === word.id;
                     return (
                       <div
                         key={word.id}
                         className={`flashcard h-40 cursor-pointer select-none`}
-                        onClick={() => toggleCard(word.id)}
+                        // CHANGED: Use new handler
+                        onClick={() => handleCardClick(word.id)}
                       >
                         <div
                           className={`flashcard-inner bg-white rounded-xl border border-gray-200 shadow-sm h-full hover:shadow-md transition-shadow ${
