@@ -122,6 +122,20 @@ const VocabPage: React.FC<VocabPageProps> = ({ session }) => {
       return;
     }
 
+    // בדיקה האם המילה כבר קיימת (ללא תלות באותיות רישיות/קטנות)
+    const isDuplicate = words.some(
+      (word) => word.english_word.toLowerCase() === trimmedEnglish.toLowerCase()
+    );
+
+    if (isDuplicate) {
+      Swal.fire({
+        text: "המילה המבוקשת כבר קיימת במאגר שלך",
+        icon: "warning",
+        confirmButtonText: "הבנתי",
+      });
+      return;
+    }
+
     const { data, error } = await supabase
       .from("user_words")
       .insert([
