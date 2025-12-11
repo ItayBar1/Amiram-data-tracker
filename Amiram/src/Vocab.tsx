@@ -4,7 +4,7 @@ import { type Session } from "@supabase/supabase-js";
 
 import { supabase } from "./supabase"; 
 
-import { Loader2, Plus, RefreshCcw, Trash2, History, Brain, Book } from "lucide-react"; 
+import { Loader2, Plus, Trash2, History, Brain, Book } from "lucide-react"; 
 
 import Swal from "sweetalert2"; 
 
