@@ -40,7 +40,7 @@ const VocabPage: React.FC<VocabPageProps> = ({ session }) => {
     setError(null);
 
     const { data, error } = await supabase
-      .from("vocab_words")
+      .from("user_words")
       .select("*")
       .eq("user_id", session.user.id)
       .order("created_at", { ascending: false });
@@ -68,7 +68,7 @@ const VocabPage: React.FC<VocabPageProps> = ({ session }) => {
     setError(null);
 
     const { data, error } = await supabase
-      .from("vocab_words")
+      .from("user_words")
       .insert([
         {
           english_word: trimmedEnglish,
