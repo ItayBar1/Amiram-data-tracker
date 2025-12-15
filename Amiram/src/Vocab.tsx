@@ -344,6 +344,9 @@ const VocabPage: React.FC<VocabPageProps> = ({ session }) => {
                 <input
                   type="text"
                   dir="ltr"
+                  lang="en"
+                  spellCheck={true}
+                  autoComplete="off"
                   placeholder="English Word"
                   className="bg-transparent outline-none px-3 py-1 w-full sm:w-40 text-sm font-medium"
                   value={englishWord}
@@ -354,6 +357,9 @@ const VocabPage: React.FC<VocabPageProps> = ({ session }) => {
                 <input
                   type="text"
                   dir="rtl"
+                  lang="he"
+                  spellCheck={true}
+                  autoComplete="off"
                   placeholder="תרגום לעברית"
                   className="bg-transparent outline-none px-3 py-1 w-full sm:w-40 text-sm font-medium text-right"
                   value={hebrewWord}
